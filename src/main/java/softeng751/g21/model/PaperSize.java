@@ -1,4 +1,4 @@
-package softeng751.g21;
+package softeng751.g21.model;
 
 public enum PaperSize {
     A0(1),

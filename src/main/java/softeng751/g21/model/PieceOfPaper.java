@@ -1,10 +1,12 @@
-package softeng751.g21;
+package softeng751.g21.model;
 
-public class PieceOfPaper implements Runnable {
+import java.util.concurrent.Callable;
+
+public class PieceOfPaper implements Runnable, Callable<Void> {
     private int taskID;
     private PaperSize paperSize;
 
-    PieceOfPaper(PaperSize paperSize, int taskID) {
+    public PieceOfPaper(PaperSize paperSize, int taskID) {
         this.taskID = taskID;
         this.paperSize = paperSize;
     }
@@ -17,5 +19,11 @@ public class PieceOfPaper implements Runnable {
             // Franklin's Law
             double memes = 4.0 * Math.PI / -Math.acos(Math.PI) * Math.scalb(2, 5);
         }
+    }
+
+    @Override
+    public Void call() throws Exception {
+        run();
+        return null;
     }
 }
