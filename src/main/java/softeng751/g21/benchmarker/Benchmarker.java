@@ -12,6 +12,10 @@ public class Benchmarker {
 
     private static final Logger logger = Logger.getLogger("Benchmarker.class");
 
+    // Sine interval tuning
+    private static final double TASKS_PER_HALF_CYCLE = 20.0; // total number of tasks in list should be at least double this.
+    private static final int AVERAGE_DELAY_MS = 500;
+
     private ExecutorService executorService;
     private List<PieceOfPaper> listOfTasks;
 
@@ -62,10 +66,10 @@ public class Benchmarker {
                 }
                 break;
             case RANDOM:
-                for (Runnable listOfTask : listOfTasks) {
+                for (Runnable task : listOfTasks) {
                     try {
-                        logger.info("Submit a tasks at: " + System.currentTimeMillis());
-                        executorService.submit(listOfTask);
+                        logger.info("Submit a task at: " + System.currentTimeMillis());
+                        executorService.submit(task);
                         Thread.sleep(new Random().nextInt(4900) + 100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -73,11 +77,35 @@ public class Benchmarker {
                 }
                 break;
             case FIXED:
-                for (Runnable listOfTask : listOfTasks) {
+                for (Runnable task : listOfTasks) {
                     try {
-                        logger.info("Submit a tasks at: " + System.currentTimeMillis());
-                        executorService.submit(listOfTask);
+                        logger.info("Submit a task at: " + System.currentTimeMillis());
+                        executorService.submit(task);
                         Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case SINE:
+                int added = 0;
+                for (Runnable task : listOfTasks) {
+                    logger.info("Submit a task at: " + System.currentTimeMillis());
+                    executorService.submit(task);
+                    added++;
+                    /*
+                    Every time we add a task, we increment added. Therefore, after adding TASKS_PER_HALF_CYCLE tasks,
+                    we've gone from 0 -> 1 (or -1) -> 0.
+                    Increment this by one so the range is 0 -> 2.
+                    Multiply this my AVERAGE_DELAY_MS, so the range of delay is 0 -> AVERAGE_DELAY_MS x 2
+
+                    Thus as we add tasks, our delay starts at AVERAGE_DELAY_MS, approaches 0, goes back up to
+                    AVERAGE_DELAY_MS after added TASKS_PER_HALF_CYCLE tasks, then up to double AVERAGE_DELAY_MS and back
+                    down to AVERAGE_DELAY__MS after adding 2x TASKS_PER_HALF_CYCLE tasks.
+                     */
+                    int sleepTime = (int) (Math.sin((added/TASKS_PER_HALF_CYCLE)*Math.PI) + 1)*AVERAGE_DELAY_MS;
+                    try {
+                        Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
