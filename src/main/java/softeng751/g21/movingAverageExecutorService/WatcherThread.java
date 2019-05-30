@@ -1,15 +1,20 @@
 package softeng751.g21.movingAverageExecutorService;
 
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class WatcherThread implements Runnable {
-    private static final int POLL_DELAY_MS = 100;
-    private static final double SMOOTHING_FACTOR = 0.5;
+    private static final int POLL_DELAY_MS = 500;
+    private static final double SMOOTHING_FACTOR = 0.1;
     private static final int MAX_THREADS_FACTOR = 1;
+    private static final boolean ENABLE_LOGGING = true;
 
     private boolean terminated = false;
+
+    private ArrayList<Integer> activeThreadsLog = new ArrayList<>();
+    private ArrayList<Double> emaLog = new ArrayList<>();
 
     private MovingAverageAdaptiveExecutorService service;
 
@@ -37,13 +42,24 @@ public class WatcherThread implements Runnable {
             if (lastEMA != null) {
                 double ema = (SMOOTHING_FACTOR * activeThreads) + (1 - SMOOTHING_FACTOR) * lastEMA;
                 // Modified EMA is weighted based on difference from the last one
-                double modifiedEma = (ema > lastEMA) ? activeThreads + (activeThreads - lastEMA) : ema;
+                double modifiedEma = (ema > lastEMA) ? activeThreads + Math.pow((activeThreads - lastEMA), 2) : ema;
                 // allocate threads as needed
                 updatePoolSize((int) Math.ceil(modifiedEma));
+
+                if (ENABLE_LOGGING) {
+                    activeThreadsLog.add(activeThreads);
+                    emaLog.add(modifiedEma);
+                }
+
                 lastEMA = modifiedEma;
             } else {
                 updatePoolSize(activeThreads);
                 lastEMA = (double) activeThreads;
+
+                if (ENABLE_LOGGING) {
+                    activeThreadsLog.add(activeThreads);
+                    emaLog.add((double) activeThreads);
+                }
             }
             try {
                 Thread.sleep(POLL_DELAY_MS);
@@ -59,5 +75,13 @@ public class WatcherThread implements Runnable {
         if (service.getMaximumPoolSize() < size * MAX_THREADS_FACTOR)
             service.setMaximumPoolSize(size * MAX_THREADS_FACTOR);
         service.setCorePoolSize(size);
+    }
+
+    public ArrayList<Integer> getActiveThreadsLog() {
+        return activeThreadsLog;
+    }
+
+    public ArrayList<Double> getEmaLog() {
+        return emaLog;
     }
 }
