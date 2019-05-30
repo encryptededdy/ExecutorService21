@@ -4,15 +4,21 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class WatcherThread implements Runnable, Callable<Void> {
+public class WatcherThread implements Runnable {
     private static final int POLL_DELAY_MS = 100;
     private static final double SMOOTHING_FACTOR = 0.5;
     private static final int MAX_THREADS_FACTOR = 1;
+
+    private boolean terminated = false;
 
     private MovingAverageAdaptiveExecutorService service;
 
     public WatcherThread(MovingAverageAdaptiveExecutorService service) {
         this.service = service;
+    }
+
+    public void requestTermination() {
+        terminated = true;
     }
 
     @Override
@@ -21,6 +27,12 @@ public class WatcherThread implements Runnable, Callable<Void> {
         System.out.println("Watcher thread started");
         Double lastEMA = null;
         for (;;) {
+            // Check if we've been asked to stop...
+            if (terminated) {
+                // write out CSV
+                return;
+            }
+
             int activeThreads = service.getActiveCount();
             if (lastEMA != null) {
                 double ema = (SMOOTHING_FACTOR * activeThreads) + (1 - SMOOTHING_FACTOR) * lastEMA;
@@ -47,11 +59,5 @@ public class WatcherThread implements Runnable, Callable<Void> {
         if (service.getMaximumPoolSize() < size * MAX_THREADS_FACTOR)
             service.setMaximumPoolSize(size * MAX_THREADS_FACTOR);
         service.setCorePoolSize(size);
-    }
-
-    @Override
-    public Void call() throws Exception {
-        run();
-        return null;
     }
 }

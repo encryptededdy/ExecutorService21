@@ -27,7 +27,7 @@ public class Benchmarker {
     }
 
     private void initTasks(TaskGranularity granularity, int numTask) {
-        switch(granularity) {
+        switch (granularity) {
             case SMALL:
                 logger.info("Adding a small tasks to task list");
                 for (int i = 1; i <= numTask; i++) {
@@ -53,7 +53,6 @@ public class Benchmarker {
                 break;
         }
     }
-
 
 
     public void start(TaskInterval interval, int timeout) {
@@ -104,7 +103,7 @@ public class Benchmarker {
                     AVERAGE_DELAY_MS after added TASKS_PER_HALF_CYCLE tasks, then up to double AVERAGE_DELAY_MS and back
                     down to AVERAGE_DELAY__MS after adding 2x TASKS_PER_HALF_CYCLE tasks.
                      */
-                    int sleepTime = (int) (Math.sin((added/TASKS_PER_HALF_CYCLE)*Math.PI) + 1)*(AVERAGE_DELAY_MS-MIN_DELAY_MS) + MIN_DELAY_MS;
+                    int sleepTime = (int) (Math.sin((added / TASKS_PER_HALF_CYCLE) * Math.PI) + 1) * (AVERAGE_DELAY_MS - MIN_DELAY_MS) + MIN_DELAY_MS;
                     try {
                         Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {

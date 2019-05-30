@@ -9,12 +9,24 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MovingAverageAdaptiveExecutorService extends ThreadPoolExecutor {
-    private Thread watcherThread;
+    private WatcherThread watcherThread;
+    private Thread watcherThreadThread;
 
     public MovingAverageAdaptiveExecutorService(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         // We use a SynchronousQueue since we want direct handoff
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, new LinkedBlockingQueue<>());
-        watcherThread = new Thread(new WatcherThread(this));
-        watcherThread.start();
+        watcherThread = new WatcherThread(this);
+        watcherThreadThread = new Thread(watcherThread);
+        watcherThreadThread.start();
+    }
+
+    @Override
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        if (super.awaitTermination(timeout, unit)) {
+            watcherThread.requestTermination();
+            watcherThreadThread.join();
+            return true;
+        }
+        return false;
     }
 }
