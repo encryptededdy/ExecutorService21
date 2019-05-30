@@ -4,9 +4,11 @@ import org.apache.commons.cli.*;
 import softeng751.g21.benchmarker.Benchmarker;
 import softeng751.g21.benchmarker.TaskGranularity;
 import softeng751.g21.benchmarker.TaskInterval;
+import softeng751.g21.movingAverageExecutorService.MovingAverageAdaptiveExecutorService;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
     private static int DEFAULT_TIMEOUT = 10;
@@ -64,6 +66,8 @@ public class Main {
                 return Executors.newCachedThreadPool();
             case ("custom"):
                 return new CustomExecutorService();
+            case ("cached"):
+                return new MovingAverageAdaptiveExecutorService(1, 2, 1, TimeUnit.SECONDS);
             default:
                 throw new ParseException("invalid ExecutorService type specified (fixed, cache, custom)");
         }
@@ -93,6 +97,8 @@ public class Main {
             case ("random"):
                 benchmarker.start(TaskInterval.RANDOM, timeout);
                 return;
+            case ("sine"):
+                benchmarker.start(TaskInterval.SINE, timeout);
             default:
                 throw new ParseException("invalid frequency of task specified (initial, fixed, random)");
         }

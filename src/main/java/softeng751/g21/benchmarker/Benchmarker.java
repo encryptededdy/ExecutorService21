@@ -81,7 +81,7 @@ public class Benchmarker {
                     try {
                         logger.info("Submit a task at: " + System.currentTimeMillis());
                         executorService.submit(task);
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
