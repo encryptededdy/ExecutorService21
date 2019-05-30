@@ -4,5 +4,6 @@ public enum TaskInterval {
     INITIAL,
     FIXED,
     RANDOM,
-    SINE
+    SINE,
+    PERIODIC_RANDOM
 }
