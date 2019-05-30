@@ -7,7 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class WatcherThread implements Runnable, Callable<Void> {
     private static final int POLL_DELAY_MS = 100;
     private static final double SMOOTHING_FACTOR = 0.5;
-    private static final int MAX_THREADS_FACTOR = 2;
+    private static final int MAX_THREADS_FACTOR = 1;
 
     private MovingAverageAdaptiveExecutorService service;
 

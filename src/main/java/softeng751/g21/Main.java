@@ -67,7 +67,7 @@ public class Main {
             case ("custom"):
                 return new CustomExecutorService();
             case ("cached"):
-                return new MovingAverageAdaptiveExecutorService(1, 2, 1, TimeUnit.SECONDS);
+                return new MovingAverageAdaptiveExecutorService(1, 1, 1, TimeUnit.SECONDS);
             default:
                 throw new ParseException("invalid ExecutorService type specified (fixed, cache, custom)");
         }
@@ -99,6 +99,7 @@ public class Main {
                 return;
             case ("sine"):
                 benchmarker.start(TaskInterval.SINE, timeout);
+                return;
             default:
                 throw new ParseException("invalid frequency of task specified (initial, fixed, random)");
         }

@@ -14,7 +14,8 @@ public class Benchmarker {
 
     // Sine interval tuning
     private static final double TASKS_PER_HALF_CYCLE = 20.0; // total number of tasks in list should be at least double this.
-    private static final int AVERAGE_DELAY_MS = 500;
+    private static final int AVERAGE_DELAY_MS = 1000;
+    private static final int MIN_DELAY_MS = 500;
 
     private ExecutorService executorService;
     private List<PieceOfPaper> listOfTasks;
@@ -103,7 +104,7 @@ public class Benchmarker {
                     AVERAGE_DELAY_MS after added TASKS_PER_HALF_CYCLE tasks, then up to double AVERAGE_DELAY_MS and back
                     down to AVERAGE_DELAY__MS after adding 2x TASKS_PER_HALF_CYCLE tasks.
                      */
-                    int sleepTime = (int) (Math.sin((added/TASKS_PER_HALF_CYCLE)*Math.PI) + 1)*AVERAGE_DELAY_MS;
+                    int sleepTime = (int) (Math.sin((added/TASKS_PER_HALF_CYCLE)*Math.PI) + 1)*(AVERAGE_DELAY_MS-MIN_DELAY_MS) + MIN_DELAY_MS;
                     try {
                         Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
