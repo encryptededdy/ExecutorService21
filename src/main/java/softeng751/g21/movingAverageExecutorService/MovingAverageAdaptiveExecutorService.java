@@ -40,10 +40,13 @@ public class MovingAverageAdaptiveExecutorService extends ThreadPoolExecutor {
     private void printToCSV() {
         ArrayList<Integer> activeThreadsLog = watcherThread.getActiveThreadsLog();
         ArrayList<Double> emaLog = watcherThread.getEmaLog();
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter("emaLog3.csv"), CSVFormat.EXCEL)) {
-            printer.printRecord("Active Threads", "Exponential Moving Average");
+        ArrayList<Long> completedLog = watcherThread.getCompletedTasksLog();
+        ArrayList<Long> scheduledLog = watcherThread.getTaskCountLog();
+
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter("emaLog4.csv"), CSVFormat.EXCEL)) {
+            printer.printRecord("Active Threads", "EMA", "Completed Tasks", "Scheduled Tasks");
             for (int i = 0; i < activeThreadsLog.size() ; i++) {
-                printer.printRecord(activeThreadsLog.get(i), emaLog.get(i));
+                printer.printRecord(activeThreadsLog.get(i), emaLog.get(i), completedLog.get(i), scheduledLog.get(i));
             }
         } catch (IOException ex) {
             ex.printStackTrace();

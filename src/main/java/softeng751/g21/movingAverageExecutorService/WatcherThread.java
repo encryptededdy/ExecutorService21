@@ -13,8 +13,11 @@ public class WatcherThread implements Runnable {
 
     private boolean terminated = false;
 
+    // Logging
     private ArrayList<Integer> activeThreadsLog = new ArrayList<>();
     private ArrayList<Double> emaLog = new ArrayList<>();
+    private ArrayList<Long> completedTasksLog = new ArrayList<>();
+    private ArrayList<Long> taskCountLog = new ArrayList<>();
 
     private MovingAverageAdaptiveExecutorService service;
 
@@ -61,6 +64,10 @@ public class WatcherThread implements Runnable {
                     emaLog.add((double) activeThreads);
                 }
             }
+            if (ENABLE_LOGGING) {
+                completedTasksLog.add(service.getCompletedTaskCount());
+                taskCountLog.add(service.getTaskCount());
+            }
             try {
                 Thread.sleep(POLL_DELAY_MS);
             } catch (InterruptedException e) {
@@ -83,5 +90,13 @@ public class WatcherThread implements Runnable {
 
     public ArrayList<Double> getEmaLog() {
         return emaLog;
+    }
+
+    public ArrayList<Long> getCompletedTasksLog() {
+        return completedTasksLog;
+    }
+
+    public ArrayList<Long> getTaskCountLog() {
+        return taskCountLog;
     }
 }
