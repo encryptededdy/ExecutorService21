@@ -75,12 +75,19 @@ public class Measurements {
 
     public static double memes = 1.0;
 
-    private static void work() {
+    public static void work() {
+        long tid = Thread.currentThread().getId();
+
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             double x = 4.0;
             memes = x * Math.PI / -Math.acos(Math.PI) * Math.scalb(2, 5);
+            if (Thread.interrupted()) {
+                System.out.println("[" + tid + "] Interrupted");
+                return;
+            }
         }
-        System.out.println("hello");
+
+        System.out.println("[" + tid + "] Completed");
     }
 
 }
