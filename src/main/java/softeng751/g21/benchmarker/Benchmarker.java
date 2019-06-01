@@ -5,6 +5,7 @@ import softeng751.g21.model.PieceOfPaper;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -16,6 +17,13 @@ public class Benchmarker {
     private static final double TASKS_PER_HALF_CYCLE = 20.0; // total number of tasks in list should be at least double this.
     private static final int AVERAGE_DELAY_MS = 1000;
     private static final int MIN_DELAY_MS = 500;
+
+    // Random tuning
+    private static final int MIN_RANDOM_DELAY_MS = 100;
+    private static final int MAX_RANDOM_DELAY_MS = 1500;
+
+    // Periodic random tuning
+    private static final int PERIODIC_RANDOM_INTERVAL = 10;
 
     private ExecutorService executorService;
     private List<PieceOfPaper> listOfTasks;
@@ -70,7 +78,24 @@ public class Benchmarker {
                     try {
                         logger.info("Submit a task at: " + System.currentTimeMillis());
                         executorService.submit(task);
-                        Thread.sleep(new Random().nextInt(4900) + 100);
+                        Thread.sleep(ThreadLocalRandom.current().nextInt(MIN_RANDOM_DELAY_MS, MAX_RANDOM_DELAY_MS));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case PERIODIC_RANDOM:
+                int randomInterval = 100;
+                for (int i = 0; i < listOfTasks.size(); i++) {
+                    try {
+                        if (i % PERIODIC_RANDOM_INTERVAL == 0) {
+                            randomInterval = ThreadLocalRandom.current().nextInt(MIN_RANDOM_DELAY_MS, MAX_RANDOM_DELAY_MS);
+                            logger.info("New random interval: " + randomInterval);
+                        }
+
+                        logger.info("Submit a task at: " + System.currentTimeMillis());
+                        executorService.submit((Runnable) listOfTasks.get(i));
+                        Thread.sleep(randomInterval);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -81,7 +106,7 @@ public class Benchmarker {
                     try {
                         logger.info("Submit a task at: " + System.currentTimeMillis());
                         executorService.submit(task);
-                        Thread.sleep(1000);
+                        Thread.sleep(AVERAGE_DELAY_MS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

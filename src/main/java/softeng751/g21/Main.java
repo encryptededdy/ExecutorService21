@@ -9,10 +9,13 @@ import softeng751.g21.movingAverageExecutorService.MovingAverageAdaptiveExecutor
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class Main {
+    private static final Logger logger = Logger.getLogger("Main.class");
+
     private static int DEFAULT_TIMEOUT = 10;
-    private static int DEFAULT_NUM_TASKS = 20;
+    private static int DEFAULT_NUM_TASKS = 100;
 
     public static void main(String[] args) {
 
@@ -100,8 +103,12 @@ public class Main {
             case ("sine"):
                 benchmarker.start(TaskInterval.SINE, timeout);
                 return;
+            case ("periodic_random"):
+                logger.info("Note: periodic_random only works well with large number of tasks (e.g. >100)");
+                benchmarker.start(TaskInterval.PERIODIC_RANDOM, timeout);
+                return;
             default:
-                throw new ParseException("invalid frequency of task specified (initial, fixed, random)");
+                throw new ParseException("invalid frequency of task specified (initial, fixed, random, sine, periodic_random)");
         }
     }
 }
