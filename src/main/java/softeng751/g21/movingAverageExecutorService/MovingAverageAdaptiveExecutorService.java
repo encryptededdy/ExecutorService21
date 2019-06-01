@@ -34,6 +34,7 @@ public class MovingAverageAdaptiveExecutorService extends ThreadPoolExecutor {
             printToCSV();
             return true;
         }
+        System.out.println("Termination failed");
         return false;
     }
 
@@ -43,10 +44,10 @@ public class MovingAverageAdaptiveExecutorService extends ThreadPoolExecutor {
         ArrayList<Long> completedLog = watcherThread.getCompletedTasksLog();
         ArrayList<Long> scheduledLog = watcherThread.getTaskCountLog();
 
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter("emaLog4.csv"), CSVFormat.EXCEL)) {
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter("emaLog.csv"), CSVFormat.EXCEL)) {
             printer.printRecord("Active Threads", "EMA", "Completed Tasks", "Scheduled Tasks");
             for (int i = 0; i < activeThreadsLog.size() ; i++) {
-                printer.printRecord(activeThreadsLog.get(i), emaLog.get(i), completedLog.get(i), scheduledLog.get(i));
+                printer.printRecord(activeThreadsLog.get(i), Math.ceil(emaLog.get(i)), completedLog.get(i), scheduledLog.get(i));
             }
         } catch (IOException ex) {
             ex.printStackTrace();

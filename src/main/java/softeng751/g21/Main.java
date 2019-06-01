@@ -72,7 +72,7 @@ public class Main {
             case ("movingaverage"):
                 return new MovingAverageAdaptiveExecutorService(1, 1, 1, TimeUnit.SECONDS);
             default:
-                throw new ParseException("invalid ExecutorService type specified (fixed, cache, custom)");
+                throw new ParseException("invalid ExecutorService type specified (fixed, cache, custom, movingaverage)");
         }
     }
 

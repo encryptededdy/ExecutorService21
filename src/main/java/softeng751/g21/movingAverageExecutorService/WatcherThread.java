@@ -6,8 +6,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class WatcherThread implements Runnable {
-    private static final int POLL_DELAY_MS = 500;
-    private static final double SMOOTHING_FACTOR = 0.1;
+    private static final int POLL_DELAY_MS = 250;
+    private static final double SMOOTHING_FACTOR = 0.5;
     private static final int MAX_THREADS_FACTOR = 1;
     private static final boolean ENABLE_LOGGING = true;
 
@@ -31,7 +31,6 @@ public class WatcherThread implements Runnable {
 
     @Override
     public void run() {
-        // TODO: Handle shutdown
         System.out.println("Watcher thread started");
         Double lastEMA = null;
         for (;;) {
@@ -45,7 +44,7 @@ public class WatcherThread implements Runnable {
             if (lastEMA != null) {
                 double ema = (SMOOTHING_FACTOR * activeThreads) + (1 - SMOOTHING_FACTOR) * lastEMA;
                 // Modified EMA is weighted based on difference from the last one
-                double modifiedEma = (ema > lastEMA) ? activeThreads + Math.pow((activeThreads - lastEMA), 2) : ema;
+                double modifiedEma = (ema > lastEMA) ? activeThreads + (activeThreads - lastEMA) : ema;
                 // allocate threads as needed
                 updatePoolSize((int) Math.ceil(modifiedEma));
 
@@ -54,7 +53,7 @@ public class WatcherThread implements Runnable {
                     emaLog.add(modifiedEma);
                 }
 
-                lastEMA = modifiedEma;
+                lastEMA = ema; // We don't store the modified EMA.
             } else {
                 updatePoolSize(activeThreads);
                 lastEMA = (double) activeThreads;

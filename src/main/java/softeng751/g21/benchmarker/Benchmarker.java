@@ -14,13 +14,13 @@ public class Benchmarker {
     private static final Logger logger = Logger.getLogger("Benchmarker.class");
 
     // Sine interval tuning
-    private static final double TASKS_PER_HALF_CYCLE = 20.0; // total number of tasks in list should be at least double this.
-    private static final int AVERAGE_DELAY_MS = 1000;
-    private static final int MIN_DELAY_MS = 500;
+    private static final double TASKS_PER_HALF_CYCLE = 50.0 ; // total number of tasks in list should be at least double this.
+    private static final int AVERAGE_DELAY_MS = 750;
+    private static final int MIN_DELAY_MS = 100;
 
     // Random tuning
     private static final int MIN_RANDOM_DELAY_MS = 100;
-    private static final int MAX_RANDOM_DELAY_MS = 1500;
+    private static final int MAX_RANDOM_DELAY_MS = 500;
 
     // Periodic random tuning
     private static final int PERIODIC_RANDOM_INTERVAL = 10;
