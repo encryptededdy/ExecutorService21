@@ -5,6 +5,7 @@ import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class Measurements {
 
@@ -78,7 +79,12 @@ public class Measurements {
     public static void work() {
         long tid = Thread.currentThread().getId();
 
-        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+        System.out.println("[" + tid + "] Started");
+
+        long start = System.currentTimeMillis();
+
+        int size = new Random().nextInt(50_000_000);
+        for (int i = 0; i < 50_000_000 + size; i++) {
             double x = 4.0;
             memes = x * Math.PI / -Math.acos(Math.PI) * Math.scalb(2, 5);
             if (Thread.interrupted()) {
@@ -87,7 +93,9 @@ public class Measurements {
             }
         }
 
-        System.out.println("[" + tid + "] Completed");
+        long end = System.currentTimeMillis();
+
+        System.out.println("[" + tid + "] Completed in " + (end - start) + "ms");
     }
 
 }

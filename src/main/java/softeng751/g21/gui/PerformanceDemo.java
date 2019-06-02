@@ -1,6 +1,7 @@
 package softeng751.g21.gui;
 
 import softeng751.g21.Measurements;
+import softeng751.g21.executors.factors.FactorExecutorService;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -9,7 +10,6 @@ import java.awt.BorderLayout;
 import java.awt.HeadlessException;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PerformanceDemo extends JFrame {
@@ -47,88 +47,25 @@ public class PerformanceDemo extends JFrame {
 
         AtomicBoolean doNothing = new AtomicBoolean(false);
 
-        JButton measureButton = new JButton();
-        measureButton.setText("Measure");
-        measureButton.addActionListener((evt) -> {
+        JButton testButton = new JButton();
+        testButton.setText("Test");
+        testButton.addActionListener((event) -> {
             if (doNothing.getAndSet(true)) {
                 return;
             }
 
-            new Thread(() -> {
-                ArrayList<Thread> threads = new ArrayList<>();
+            FactorExecutorService service = new FactorExecutorService();
 
-                int noThreads = 0;
-                int ptick = 0;
-                int tick = 0;
+            // Performance deteriorates after 58 FPS
+            service.addThreadCountFactor(() -> tracker.getFps() <= 58);
 
-                while (true) {
-                    System.out.println("Tick " + ptick);
-
-                    tick++;
-                    if (tick % (noThreads <= 50 ? 5 : 15) == 0) {
-                        Thread thread = new Thread(Measurements::work);
-                        threads.add(thread);
-                        thread.start();
-                        noThreads++;
-                        System.out.println("Created " + noThreads + " threads");
-                    }
-
-                    if (tracker.getFps() <= 59) {
-                        ptick++;
-                        if (ptick >= 25) {
-                            System.out.println("Created " + noThreads + " threads before performance deteriorated");
-                            break;
-                        }
-                    } else {
-                        ptick = Math.max(0, ptick - 1);
-                    }
-
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                try {
-                    Thread.sleep(10_000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                ptick = 0;
-
-                while (true) {
-                    System.out.println("Tick " + ptick);
-
-                    tick++;
-                    if (tick % 25 == 0) {
-                        threads.remove(0).interrupt();
-                        noThreads--;
-                    }
-
-                    if (tracker.getFps() >= 59) {
-                        ptick++;
-                        if (ptick >= 25) {
-                            break;
-                        }
-                    } else {
-                        ptick = Math.max(0, ptick - 1);
-                    }
-
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                System.out.println("Completed, decided on " + noThreads + " for optimal performance");
-            }).start();
+            for (int i = 0; i < 1000; i++) {
+                service.submit(Measurements::work);
+            }
         });
 
         // add(startWorkButton, BorderLayout.SOUTH);
-        add(measureButton, BorderLayout.SOUTH);
+        add(testButton, BorderLayout.SOUTH);
 
         add(new Bounce(), BorderLayout.CENTER);
     }
