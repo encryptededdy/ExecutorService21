@@ -24,8 +24,13 @@ public class SleepyThreadWatcher implements Runnable {
 
     @Override
     public void run() {
+        int sleep = 300;
+
         while (!Thread.interrupted()) {
             Collection<?> workers = getWorkers();
+
+            double utilization = 0.0;
+            double maxUtilization = 0.0;
 
             if (workers != null) {
                 for (Object worker : workers) {
@@ -38,17 +43,29 @@ public class SleepyThreadWatcher implements Runnable {
 
                     long oldTime = cpuTimes.getOrDefault(id, 0L);
                     long newTime = bean.getThreadCpuTime(id);
+
+                    cpuTimes.put(id, newTime);
+
                     // Spent no time on CPU, probably sleeping
                     if (newTime - oldTime == 0) {
                         System.out.println("[" + id + "] is probably sleeping");
+                    } else {
+                        System.out.println("[" + id + "] was running for " + (newTime - oldTime) + "ns");
                     }
 
-                    cpuTimes.put(id, newTime);
+                    double percentage = Math.max(0.0, newTime - oldTime) / sleep / 1000000.0;
+                    if (percentage >= 1.0) percentage = 1.0;
+                    utilization += percentage;
+                    maxUtilization += 1.0;
                 }
             }
 
+            double percentUtilization = utilization / maxUtilization;
+            int supplementary = (int) ((1.0 - percentUtilization) * parent.getActiveCount());
+            System.out.println("Utilizing " + percentUtilization + " and could spawn " + supplementary + " more threads");
+
             try {
-                Thread.sleep(500);
+                Thread.sleep(sleep);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -39,7 +39,7 @@ public class PerformanceDemo extends JFrame {
         startWorkButton.addActionListener((evt) -> {
             System.out.println("Doing work");
             for (int i = 0; i < 100; i++) {
-                Thread thread = new Thread(Measurements::work);
+                Thread thread = new Thread(Measurements::randomWork);
                 thread.setPriority(1);
                 thread.start();
             }
@@ -60,7 +60,7 @@ public class PerformanceDemo extends JFrame {
             service.addThreadCountFactor(() -> tracker.getFps() <= 58);
 
             for (int i = 0; i < 1000; i++) {
-                service.submit(Measurements::work);
+                service.submit(Measurements::randomWork);
             }
         });
 

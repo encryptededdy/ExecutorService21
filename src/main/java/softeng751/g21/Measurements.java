@@ -29,7 +29,7 @@ public class Measurements {
         List<Thread> pool = new ArrayList<>();
 
         for (int i = 0; i < numThreads; i++) {
-            Thread thread = new Thread(Measurements::work);
+            Thread thread = new Thread(Measurements::randomWork);
             pool.add(thread);
             thread.start();
         }
@@ -76,26 +76,30 @@ public class Measurements {
 
     public static double memes = 1.0;
 
-    public static void work() {
+    public static void randomWork() {
+        int randomness = new Random().nextInt(50_000_000);
+        work(50_000_000 + randomness);
+    }
+
+    public static void work(int iterations) {
         long tid = Thread.currentThread().getId();
 
-        System.out.println("[" + tid + "] Started");
+        // System.out.println("[" + tid + "] Started");
 
         long start = System.currentTimeMillis();
 
-        int size = new Random().nextInt(50_000_000);
-        for (int i = 0; i < 50_000_000 + size; i++) {
+        for (int i = 0; i < iterations; i++) {
             double x = 4.0;
             memes = x * Math.PI / -Math.acos(Math.PI) * Math.scalb(2, 5);
             if (Thread.interrupted()) {
-                System.out.println("[" + tid + "] Interrupted");
+                // System.out.println("[" + tid + "] Interrupted");
                 return;
             }
         }
 
         long end = System.currentTimeMillis();
 
-        System.out.println("[" + tid + "] Completed in " + (end - start) + "ms");
+        // System.out.println("[" + tid + "] Completed in " + (end - start) + "ms");
     }
 
 }
