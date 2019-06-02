@@ -18,9 +18,9 @@ public class MovingAverageAdaptiveExecutorService extends ThreadPoolExecutor {
     private WatcherThread watcherThread;
     private Thread watcherThreadThread;
 
-    public MovingAverageAdaptiveExecutorService(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
+    public MovingAverageAdaptiveExecutorService(int corePoolSize, long keepAliveTime, TimeUnit unit) {
         // We use a SynchronousQueue since we want direct handoff
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, new LinkedBlockingQueue<>());
+        super(corePoolSize, Integer.MAX_VALUE, keepAliveTime, unit, new LinkedBlockingQueue<>());
         watcherThread = new WatcherThread(this);
         watcherThreadThread = new Thread(watcherThread);
         watcherThreadThread.start();
@@ -47,7 +47,7 @@ public class MovingAverageAdaptiveExecutorService extends ThreadPoolExecutor {
         try (CSVPrinter printer = new CSVPrinter(new FileWriter("emaLog.csv"), CSVFormat.EXCEL)) {
             printer.printRecord("Active Threads", "EMA", "Completed Tasks", "Scheduled Tasks");
             for (int i = 0; i < activeThreadsLog.size() ; i++) {
-                printer.printRecord(activeThreadsLog.get(i), Math.ceil(emaLog.get(i)), completedLog.get(i), scheduledLog.get(i));
+                printer.printRecord(activeThreadsLog.get(i), Math.round(emaLog.get(i)), completedLog.get(i), scheduledLog.get(i));
             }
         } catch (IOException ex) {
             ex.printStackTrace();

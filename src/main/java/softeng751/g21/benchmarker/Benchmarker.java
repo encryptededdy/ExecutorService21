@@ -14,13 +14,13 @@ public class Benchmarker {
     private static final Logger logger = Logger.getLogger("Benchmarker.class");
 
     // Sine interval tuning
-    private static final double TASKS_PER_HALF_CYCLE = 50.0 ; // total number of tasks in list should be at least double this.
+    private static final double TASKS_PER_HALF_CYCLE = 25.0 ; // total number of tasks in list should be at least double this.
     private static final int AVERAGE_DELAY_MS = 750;
     private static final int MIN_DELAY_MS = 100;
 
     // Random tuning
     private static final int MIN_RANDOM_DELAY_MS = 100;
-    private static final int MAX_RANDOM_DELAY_MS = 500;
+    private static final int MAX_RANDOM_DELAY_MS = 1500;
 
     // Periodic random tuning
     private static final int PERIODIC_RANDOM_INTERVAL = 10;
@@ -74,10 +74,11 @@ public class Benchmarker {
                 }
                 break;
             case RANDOM:
-                for (Runnable task : listOfTasks) {
+                for (PieceOfPaper task : listOfTasks) {
                     try {
+                        task.startLatencyTiming();
                         logger.info("Submit a task at: " + System.currentTimeMillis());
-                        executorService.submit(task);
+                        executorService.submit((Runnable) task);
                         Thread.sleep(ThreadLocalRandom.current().nextInt(MIN_RANDOM_DELAY_MS, MAX_RANDOM_DELAY_MS));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -94,6 +95,7 @@ public class Benchmarker {
                         }
 
                         logger.info("Submit a task at: " + System.currentTimeMillis());
+                        listOfTasks.get(i).startLatencyTiming();
                         executorService.submit((Runnable) listOfTasks.get(i));
                         Thread.sleep(randomInterval);
                     } catch (InterruptedException e) {
@@ -102,10 +104,11 @@ public class Benchmarker {
                 }
                 break;
             case FIXED:
-                for (Runnable task : listOfTasks) {
+                for (PieceOfPaper task : listOfTasks) {
                     try {
                         logger.info("Submit a task at: " + System.currentTimeMillis());
-                        executorService.submit(task);
+                        task.startLatencyTiming();
+                        executorService.submit((Runnable) task);
                         Thread.sleep(AVERAGE_DELAY_MS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -114,9 +117,10 @@ public class Benchmarker {
                 break;
             case SINE:
                 int added = 0;
-                for (Runnable task : listOfTasks) {
+                for (PieceOfPaper task : listOfTasks) {
                     logger.info("Submit a task at: " + System.currentTimeMillis());
-                    executorService.submit(task);
+                    task.startLatencyTiming();
+                    executorService.submit((Runnable) task);
                     added++;
                     /*
                     Every time we add a task, we increment added. Therefore, after adding TASKS_PER_HALF_CYCLE tasks,
@@ -144,5 +148,7 @@ public class Benchmarker {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        LatencyMonitor.getInstance().writeCSV("latency.csv");
     }
 }

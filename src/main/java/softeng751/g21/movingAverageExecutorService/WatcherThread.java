@@ -6,10 +6,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class WatcherThread implements Runnable {
-    private static final int POLL_DELAY_MS = 250;
+    private static final int POLL_DELAY_MS = 500;
     private static final double SMOOTHING_FACTOR = 0.5;
-    private static final int MAX_THREADS_FACTOR = 1;
-    private static final boolean ENABLE_LOGGING = true;
+//    private static final int MAX_THREADS_FACTOR = 4;
+    private static final boolean ENABLE_LOGGING = false;
 
     private boolean terminated = false;
 
@@ -46,7 +46,7 @@ public class WatcherThread implements Runnable {
                 // Modified EMA is weighted based on difference from the last one
                 double modifiedEma = (ema > lastEMA) ? activeThreads + (activeThreads - lastEMA) : ema;
                 // allocate threads as needed
-                updatePoolSize((int) Math.ceil(modifiedEma));
+                updatePoolSize((int) Math.round(modifiedEma));
 
                 if (ENABLE_LOGGING) {
                     activeThreadsLog.add(activeThreads);
@@ -78,8 +78,8 @@ public class WatcherThread implements Runnable {
     private void updatePoolSize(int size) {
         System.out.println("Pool Size: " + size);
         // If max pool size drops below double the core pool size, update it
-        if (service.getMaximumPoolSize() < size * MAX_THREADS_FACTOR)
-            service.setMaximumPoolSize(size * MAX_THREADS_FACTOR);
+//        if (service.getMaximumPoolSize() < size * MAX_THREADS_FACTOR)
+//            service.setMaximumPoolSize(size * MAX_THREADS_FACTOR);
         service.setCorePoolSize(size);
     }
 
