@@ -67,10 +67,8 @@ public class Main {
                 return Executors.newFixedThreadPool(threads);
             case ("cache"):
                 return Executors.newCachedThreadPool();
-            case ("custom"):
-                return new CustomExecutorService();
             case ("movingaverage"):
-                return new MovingAverageAdaptiveExecutorService(1, 1, 1, TimeUnit.SECONDS);
+                return new MovingAverageAdaptiveExecutorService( 1, 1, TimeUnit.SECONDS);
             default:
                 throw new ParseException("invalid ExecutorService type specified (fixed, cache, custom, movingaverage)");
         }
