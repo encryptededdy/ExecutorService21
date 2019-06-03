@@ -70,7 +70,7 @@ public class PerformanceDemo extends JFrame {
             setButtonsEnabled.accept(false);
             FactorExecutorService service = new FactorExecutorService();
             service.addThreadCountFactor(() -> tracker.getFps() <= 58);
-            benchmark(service, () -> setButtonsEnabled.accept(true));
+            benchmark(service);
         });
 
         JButton cached = new JButton();
@@ -78,7 +78,7 @@ public class PerformanceDemo extends JFrame {
         cached.addActionListener((event) -> {
             setButtonsEnabled.accept(false);
             ExecutorService service = Executors.newCachedThreadPool();
-            benchmark(service, () -> setButtonsEnabled.accept(true));
+            benchmark(service);
         });
 
         JButton fixed = new JButton();
@@ -94,7 +94,7 @@ public class PerformanceDemo extends JFrame {
             }
             setButtonsEnabled.accept(false);
             ExecutorService service = Executors.newFixedThreadPool(count);
-            benchmark(service, () -> setButtonsEnabled.accept(true));
+            benchmark(service);
         });
 
         buttons.add(dynamic);
@@ -106,7 +106,7 @@ public class PerformanceDemo extends JFrame {
         add(new Bounce(), BorderLayout.CENTER);
     }
 
-    private void benchmark(ExecutorService service, Runnable onComplete) {
+    private void benchmark(ExecutorService service) {
         int tasks = 100;
 
         List<Future> futures = new ArrayList<>(tasks);
@@ -130,7 +130,7 @@ public class PerformanceDemo extends JFrame {
             long end = System.currentTimeMillis();
             System.out.println("Time taken is " + (end - start) + "ms");
 
-            onComplete.run();
+            System.exit(0);
         }).start();
     }
 }
