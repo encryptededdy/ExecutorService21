@@ -5,14 +5,25 @@ import softeng751.g21.executors.factors.FactorExecutorService;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.awt.BorderLayout;
 import java.awt.HeadlessException;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 public class PerformanceDemo extends JFrame {
+
+    private final RenderTracker tracker;
+
     public static void main(String[] args) {
         new PerformanceDemo().setVisible(true);
     }
@@ -24,7 +35,7 @@ public class PerformanceDemo extends JFrame {
         setTitle("Performance demo");
 
         int targetFps = 60;
-        RenderTracker tracker = new RenderTracker(targetFps);
+        tracker = new RenderTracker(targetFps);
         add(tracker, BorderLayout.EAST);
 
         Label label = new Label();
@@ -45,28 +56,81 @@ public class PerformanceDemo extends JFrame {
             }
         });
 
-        AtomicBoolean doNothing = new AtomicBoolean(false);
+        JPanel buttons = new JPanel();
 
-        JButton testButton = new JButton();
-        testButton.setText("Test");
-        testButton.addActionListener((event) -> {
-            if (doNothing.getAndSet(true)) {
-                return;
+        Consumer<Boolean> setButtonsEnabled = (enabled) -> {
+            for (int i = 0; i < buttons.getComponentCount(); i++) {
+                buttons.getComponent(i).setEnabled(enabled);
             }
+        };
 
+        JButton dynamic = new JButton();
+        dynamic.setText("Benchmark Dynamic Executor Service");
+        dynamic.addActionListener((event) -> {
+            setButtonsEnabled.accept(false);
             FactorExecutorService service = new FactorExecutorService();
-
-            // Performance deteriorates after 58 FPS
             service.addThreadCountFactor(() -> tracker.getFps() <= 58);
-
-            for (int i = 0; i < 1000; i++) {
-                service.submit(Measurements::randomWork);
-            }
+            benchmark(service, () -> setButtonsEnabled.accept(true));
         });
 
-        // add(startWorkButton, BorderLayout.SOUTH);
-        add(testButton, BorderLayout.SOUTH);
+        JButton cached = new JButton();
+        cached.setText("Benchmark Cached Executor Service");
+        cached.addActionListener((event) -> {
+            setButtonsEnabled.accept(false);
+            ExecutorService service = Executors.newCachedThreadPool();
+            benchmark(service, () -> setButtonsEnabled.accept(true));
+        });
+
+        JButton fixed = new JButton();
+        fixed.setText("Benchmark Fixed Thread Pool Service");
+        fixed.addActionListener((event) -> {
+            String input = JOptionPane.showInputDialog(PerformanceDemo.this, "How many threads in the pool?");
+            int count;
+            try {
+                count = Integer.parseInt(input);
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(PerformanceDemo.this, "Invalid integer");
+                return;
+            }
+            setButtonsEnabled.accept(false);
+            ExecutorService service = Executors.newFixedThreadPool(count);
+            benchmark(service, () -> setButtonsEnabled.accept(true));
+        });
+
+        buttons.add(dynamic);
+        buttons.add(cached);
+        buttons.add(fixed);
+
+        add(buttons, BorderLayout.SOUTH);
 
         add(new Bounce(), BorderLayout.CENTER);
+    }
+
+    private void benchmark(ExecutorService service, Runnable onComplete) {
+        int tasks = 100;
+
+        List<Future> futures = new ArrayList<>(tasks);
+
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < tasks; i++) {
+            Future<?> future = service.submit(Measurements::randomWork);
+            futures.add(future);
+        }
+
+        new Thread(() -> {
+            for (Future future : futures) {
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            long end = System.currentTimeMillis();
+            System.out.println("Time taken is " + (end - start) + "ms");
+
+            onComplete.run();
+        }).start();
     }
 }
