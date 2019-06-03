@@ -84,7 +84,6 @@ public class SleepyThreadWatcher implements Runnable {
         return null;
     }
 
-
     private Long getId(Object worker) {
         try {
             Field thread = worker.getClass().getDeclaredField("thread");

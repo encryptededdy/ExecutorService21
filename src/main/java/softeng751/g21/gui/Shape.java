@@ -34,6 +34,17 @@ public class Shape implements Paintable {
         type = types[random.nextInt(types.length)];
     }
 
+    public Shape(int x, int y, int width, int height, int dx, int dy, int r, int g, int b, Type type) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.dx = dx;
+        this.dy = dy;
+        this.color = new Color(r, g, b);
+        this.type = type;
+    }
+
     @Override
     public void paint(Graphics g, Bounce parent) {
         g.setColor(color);
@@ -63,7 +74,24 @@ public class Shape implements Paintable {
         }
     }
 
-    private enum Type {
+    public enum Type {
         OVAL, F_OVAL, RECTANGLE, F_RECTANGLE
     }
+
+    @Override
+    public String toString() {
+        return "new Shape(" +
+                x + ", "
+                + y + ", "
+                + width + ", "
+                + height + ", "
+                + dx + ", "
+                + dy + ", "
+                + color.getRed() + ", "
+                + color.getGreen() + ", "
+                + color.getBlue() + ", "
+                + type +
+                ')';
+    }
+
 }

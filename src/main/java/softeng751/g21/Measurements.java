@@ -5,7 +5,6 @@ import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class Measurements {
 
@@ -77,8 +76,7 @@ public class Measurements {
     public static double memes = 1.0;
 
     public static void randomWork() {
-        int randomness = new Random().nextInt(50_000_000);
-        work(50_000_000 + randomness);
+        work(100_000_000);
     }
 
     public static void work(int iterations) {
