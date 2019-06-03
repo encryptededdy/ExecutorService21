@@ -65,12 +65,12 @@ public class Main {
             case ("fixed"):
                 int threads = cmd.hasOption("t") ? Integer.parseInt(cmd.getOptionValue("t")) : Runtime.getRuntime().availableProcessors();
                 return Executors.newFixedThreadPool(threads);
-            case ("cache"):
+            case ("cached"):
                 return Executors.newCachedThreadPool();
-            case ("movingaverage"):
-                return new MovingAverageAdaptiveExecutorService( 1, 1, TimeUnit.SECONDS);
+            case ("moving_average"):
+                return new MovingAverageAdaptiveExecutorService(1, 1, TimeUnit.SECONDS);
             default:
-                throw new ParseException("invalid ExecutorService type specified (fixed, cache, custom, movingaverage)");
+                throw new ParseException("invalid ExecutorService type specified (fixed, cached, moving_average)");
         }
     }
 
