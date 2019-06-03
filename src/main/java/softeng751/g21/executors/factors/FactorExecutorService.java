@@ -11,7 +11,7 @@ public class FactorExecutorService extends ThreadPoolExecutor {
     private final Thread watcherThread;
 
     public FactorExecutorService() {
-        this(Runtime.getRuntime().availableProcessors(), 200, 10, TimeUnit.SECONDS);
+        this(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors(), 10, TimeUnit.SECONDS);
     }
 
     public FactorExecutorService(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {

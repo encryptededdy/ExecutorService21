@@ -84,7 +84,7 @@ public class Measurements {
     public static void work(int iterations) {
         long tid = Thread.currentThread().getId();
 
-        // System.out.println("[" + tid + "] Started");
+        System.out.println("[" + tid + "] Started");
 
         long start = System.currentTimeMillis();
 
@@ -92,14 +92,14 @@ public class Measurements {
             double x = 4.0;
             memes = x * Math.PI / -Math.acos(Math.PI) * Math.scalb(2, 5);
             if (Thread.interrupted()) {
-                // System.out.println("[" + tid + "] Interrupted");
+                System.out.println("[" + tid + "] Interrupted");
                 return;
             }
         }
 
         long end = System.currentTimeMillis();
 
-        // System.out.println("[" + tid + "] Completed in " + (end - start) + "ms");
+        System.out.println("[" + tid + "] Completed in " + (end - start) + "ms");
     }
 
 }
