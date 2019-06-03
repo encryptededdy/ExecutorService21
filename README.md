@@ -46,3 +46,17 @@ Specify the maximum execution time for a single task.
 -timeout  
 **Default**:  
 10s
+
+## Additional Data Recording
+### Exponential Moving Average Logging
+When enabled, this writes out a CSV file `emalog.csv` that contains the number of active threads, current EMA prediction and added/finished tasks at each interval of EMA prediction.
+
+**To Enable**
+
+Enable the `ENABLE_CSV_WRITE` flag in `MovingAverageAdaptiveExecutorService`, and enable `ENABLE_LOGGING` in `WatcherThread`, otherwise the CSV output will be empty.
+### Latency Logging
+When enabled, a CSV file is written out with rows representing the start latency of all tasks that were scheduled, measured in nanoseconds.
+
+**To Enable**
+
+Enable the `ENABLE_LATENCY_LOGGING` flag in `Benchmarker`

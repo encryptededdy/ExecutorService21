@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MovingAverageAdaptiveExecutorService extends ThreadPoolExecutor {
     private WatcherThread watcherThread;
     private Thread watcherThreadThread;
+    private static final boolean ENABLE_CSV_WRITE = true;
 
     public MovingAverageAdaptiveExecutorService(int corePoolSize, long keepAliveTime, TimeUnit unit) {
         // We use a SynchronousQueue since we want direct handoff
@@ -39,19 +40,20 @@ public class MovingAverageAdaptiveExecutorService extends ThreadPoolExecutor {
     }
 
     private void printToCSV() {
-        ArrayList<Integer> activeThreadsLog = watcherThread.getActiveThreadsLog();
-        ArrayList<Double> emaLog = watcherThread.getEmaLog();
-        ArrayList<Long> completedLog = watcherThread.getCompletedTasksLog();
-        ArrayList<Long> scheduledLog = watcherThread.getTaskCountLog();
+        if (ENABLE_CSV_WRITE) {
+            ArrayList<Integer> activeThreadsLog = watcherThread.getActiveThreadsLog();
+            ArrayList<Double> emaLog = watcherThread.getEmaLog();
+            ArrayList<Long> completedLog = watcherThread.getCompletedTasksLog();
+            ArrayList<Long> scheduledLog = watcherThread.getTaskCountLog();
 
-        try (CSVPrinter printer = new CSVPrinter(new FileWriter("emaLog.csv"), CSVFormat.EXCEL)) {
-            printer.printRecord("Active Threads", "EMA", "Completed Tasks", "Scheduled Tasks");
-            for (int i = 0; i < activeThreadsLog.size() ; i++) {
-                printer.printRecord(activeThreadsLog.get(i), Math.round(emaLog.get(i)), completedLog.get(i), scheduledLog.get(i));
+            try (CSVPrinter printer = new CSVPrinter(new FileWriter("emaLog.csv"), CSVFormat.EXCEL)) {
+                printer.printRecord("Active Threads", "EMA", "Completed Tasks", "Scheduled Tasks");
+                for (int i = 0; i < activeThreadsLog.size(); i++) {
+                    printer.printRecord(activeThreadsLog.get(i), Math.round(emaLog.get(i)), completedLog.get(i), scheduledLog.get(i));
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
         }
-
     }
 }

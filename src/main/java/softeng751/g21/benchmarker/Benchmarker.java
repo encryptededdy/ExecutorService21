@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 public class Benchmarker {
 
     private static final Logger logger = Logger.getLogger("Benchmarker.class");
+    private static final boolean ENABLE_LATENCY_LOGGING = false;
 
     // Sine interval tuning
     private static final double TASKS_PER_HALF_CYCLE = 25.0 ; // total number of tasks in list should be at least double this.
@@ -68,6 +69,9 @@ public class Benchmarker {
             case INITIAL:
                 logger.info("Submitting all tasks at: " + System.currentTimeMillis());
                 try {
+                    if (ENABLE_LATENCY_LOGGING)
+                        listOfTasks.forEach(PieceOfPaper::startLatencyTiming);
+
                     executorService.invokeAll(listOfTasks);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -76,7 +80,9 @@ public class Benchmarker {
             case RANDOM:
                 for (PieceOfPaper task : listOfTasks) {
                     try {
-                        task.startLatencyTiming();
+                        if (ENABLE_LATENCY_LOGGING)
+                            task.startLatencyTiming();
+
                         logger.info("Submit a task at: " + System.currentTimeMillis());
                         executorService.submit((Runnable) task);
                         Thread.sleep(ThreadLocalRandom.current().nextInt(MIN_RANDOM_DELAY_MS, MAX_RANDOM_DELAY_MS));
@@ -95,7 +101,9 @@ public class Benchmarker {
                         }
 
                         logger.info("Submit a task at: " + System.currentTimeMillis());
-                        listOfTasks.get(i).startLatencyTiming();
+                        if (ENABLE_LATENCY_LOGGING)
+                            listOfTasks.get(i).startLatencyTiming();
+
                         executorService.submit((Runnable) listOfTasks.get(i));
                         Thread.sleep(randomInterval);
                     } catch (InterruptedException e) {
@@ -107,7 +115,9 @@ public class Benchmarker {
                 for (PieceOfPaper task : listOfTasks) {
                     try {
                         logger.info("Submit a task at: " + System.currentTimeMillis());
-                        task.startLatencyTiming();
+                        if (ENABLE_LATENCY_LOGGING)
+                            task.startLatencyTiming();
+
                         executorService.submit((Runnable) task);
                         Thread.sleep(AVERAGE_DELAY_MS);
                     } catch (InterruptedException e) {
@@ -119,7 +129,9 @@ public class Benchmarker {
                 int added = 0;
                 for (PieceOfPaper task : listOfTasks) {
                     logger.info("Submit a task at: " + System.currentTimeMillis());
-                    task.startLatencyTiming();
+                    if (ENABLE_LATENCY_LOGGING)
+                        task.startLatencyTiming();
+
                     executorService.submit((Runnable) task);
                     added++;
                     /*
@@ -148,7 +160,7 @@ public class Benchmarker {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        LatencyMonitor.getInstance().writeCSV("latency.csv");
+        if (ENABLE_LATENCY_LOGGING)
+            LatencyMonitor.getInstance().writeCSV("latency.csv");
     }
 }
