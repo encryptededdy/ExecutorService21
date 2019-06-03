@@ -60,3 +60,21 @@ When enabled, a CSV file is written out with rows representing the start latency
 **To Enable**
 
 Enable the `ENABLE_LATENCY_LOGGING` flag in `Benchmarker`
+
+## GUI Performance Demo
+
+To run the GUI performance demo, run the main class `softeng751.g21.gui.PerformanceDemo`
+
+No arguments are required, however any useful output is printed out to the standard out.
+
+After running a benchmark the demo will automatically quit.
+
+## Thread Utilization
+
+To run the thread utilization demo, run the main class `softeng751.g21.sleepy.Main`
+
+There is one argument whose value can be either "sleepy" or "fixed". Default value is "sleepy"
+
+The value "sleepy" runs the tasks on our `softeng751.g21.sleepy.SleepyExecutorService` implementation
+
+The value "fixed" runs the tasks on Java's `FixedThreadPool` implementation
